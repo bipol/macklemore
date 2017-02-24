@@ -2,7 +2,9 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
+import Date exposing (..)
+import Task exposing (..)
+import Geolocation exposing (..)
 
 
 -- # Main
@@ -10,10 +12,11 @@ import Html.Events exposing (onClick)
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = model
-        , view = view
+    Html.program
+        { init = init
         , update = update
+        , subscriptions = subscriptions
+        , view = view
         }
 
 
@@ -22,12 +25,28 @@ main =
 
 
 type alias Model =
-    Int
+    { location : Maybe Location
+    , startTime : Maybe Date
+    , endTime : Maybe Date
+    }
 
 
-model : Model
-model =
-    0
+defaultModel : Model
+defaultModel =
+    Model
+        Nothing
+        Nothing
+        Nothing
+
+
+init : ( Model, Cmd Msg )
+init =
+    defaultModel
+        ! [ Cmd.batch
+                [ Task.perform GetInitialDate Date.now
+                , Task.attempt GetInitialLocation Geolocation.now
+                ]
+          ]
 
 
 
@@ -35,33 +54,68 @@ model =
 
 
 type Msg
-    = Inc
-    | Dec
+    = GetInitialDate Date
+    | GetInitialLocation (Result Error Location)
+    | InputSearch String
+    | NoOp
 
 
 
 -- # Update
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Inc ->
-            model + 1
+        GetInitialDate date ->
+            { model | startTime = Just date } ! []
 
-        Dec ->
-            model - 1
+        GetInitialLocation (Ok location) ->
+            { model | location = Just location } ! []
+
+        GetInitialLocation (Err location) ->
+            { model | location = Nothing } ! []
+
+        InputSearch string ->
+            model ! []
+
+        NoOp ->
+            model ! []
 
 
 
 -- # View
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
-        [ h1 [] [ text "Counterlicious" ]
-        , div [] [ text "Count: ", text (toString model) ]
-        , button [ onClick Dec ] [ text "Decrement" ]
-        , button [ onClick Inc ] [ text "Increment" ]
+        [ h1 [] [ text "I <3 Macklemore" ]
+        , div [] [ text "Time: ", text (toString model.startTime) ]
+        , div [] [ text "Location: ", text (toString model.location) ]
         ]
+
+
+type alias Place =
+    { title : String
+    , eventTime : Date
+    , location : String
+    }
+
+
+placeCard : Place -> Html Msg
+placeCard place =
+    div
+        []
+        []
+
+
+itinerary : List Place -> Html Msg
+itinerary places =
+    div []
+        []
