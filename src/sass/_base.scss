@@ -1,0 +1,47 @@
+
+html
+{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+//@todo: decide on a global font
+
+body {
+  max-width: 1920px;
+  min-width: 320px;
+  font-size: 14px;
+  color: #FFF;
+  margin: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+header {
+  padding-top: 64px;
+}
+
+a {
+  color: #FFF;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: #FFF;
+    text-decoration: underline;
+  }
+}
+
+input {
+  border: none;
+  background: none;
+
+  &:focus {
+      outline: none;
+    }
+}
