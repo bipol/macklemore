@@ -1,8 +1,5 @@
-# ELM-STARTER!
-
-![Elm Logo](https://cloud.githubusercontent.com/assets/1227109/15035161/e3ec838a-123b-11e6-8d3a-ca0f4b0106c8.png)
-
-![Traffic light](https://cloud.githubusercontent.com/assets/1227109/9126376/c2e91d9a-3c69-11e5-86fd-f8119155447c.png)
+# MACKLEMORE 
+![Traffic light](http://powellong.com/data/images/macklemore-images/macklemore-images-3.jpg)
 
 
 ## Quickstart
