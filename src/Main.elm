@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Navigation
 import Html.Attributes exposing (class)
 import Date exposing (..)
 import Task exposing (..)
@@ -16,7 +17,7 @@ import Http
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program UrlChange
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -45,8 +46,8 @@ defaultModel =
         Nothing
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Navigation.Location -> ( Model, Cmd Msg )
+init location =
     defaultModel
         ! [ Cmd.batch
                 [ Task.perform GetInitialDate Date.now
@@ -64,6 +65,7 @@ type Msg
     | GetInitialLocation (Result Error Location)
     | GetItinerary (Result Http.Error (List Place))
     | InputSearch String
+    | UrlChange Navigation.Location
     | NoOp
 
 
@@ -96,6 +98,9 @@ update msg model =
         InputSearch string ->
             model ! []
 
+        UrlChange location ->
+            model ! []
+
         NoOp ->
             model ! []
 
@@ -114,7 +119,7 @@ view model =
     case model.itinerary of
         Just itinerary ->
             div [ class "container" ]
-                [ h1 [] [ text "I <3 Macklemore" ]
+                [ h1 [] [ text "pray4death" ]
                 , div [] [ text "Time: ", text (toString model.startTime) ]
                 , div [] [ text "Location: ", text (toString model.location) ]
                 , itineraryView itinerary
@@ -122,7 +127,7 @@ view model =
 
         Nothing ->
             div [ class "container" ]
-                [ h1 [] [ text "I <3 Macklemore" ]
+                [ h1 [] [ text "pray4death" ]
                 , div [] [ text "Time: ", text (toString model.startTime) ]
                 , div [] [ text "Location: ", text (toString model.location) ]
                 , div [] [ text "Please turn on your JS stuff kthx" ]
