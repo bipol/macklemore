@@ -14,8 +14,11 @@ class Carousel {
 
         this.activitySelectedCount = 0;
         this.el = $('.carousel');
-        
-        this.el.slick(Carousel.settings);
+
+
+        $(document).ready((e) => {
+            $('.carousel').slick(Carousel.settings);
+        });
     }
 
     setupEvents() {

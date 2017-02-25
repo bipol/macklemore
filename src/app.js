@@ -8255,7 +8255,9 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                     this.activitySelectedCount = 0;
                     this.el = $('.carousel');
 
-                    this.el.slick(Carousel.settings);
+                    $(document).ready(function (e) {
+                        $('.carousel').slick(Carousel.settings);
+                    });
                 }
 
                 _createClass(Carousel, [{
