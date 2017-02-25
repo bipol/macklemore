@@ -80,6 +80,7 @@ update msg model =
         GetInitialDate date ->
             { model | startTime = Just date } ! []
 
+        -- there is an assumption here that we will have the date before the location
         GetInitialLocation (Ok location) ->
             { model | location = Just location } ! [ getItinerary ]
 
@@ -124,8 +125,7 @@ view model =
 
         Nothing ->
             div []
-                [ div [] [ text "Please turn on your JS stuff kthx" ]
-                , div [] [ text "Loading..." ]
+                [ div [] [ text "Loading..." ]
                 ]
 
 
@@ -184,6 +184,15 @@ placeCard place =
             , div
                 [ class "event__time-block" ]
                 [ text <| toString place.event_time ]
+            ]
+        , div
+            [ class "event__distance" ]
+            [ div
+                [ class "event__distance-value" ]
+                [ text <| toString place.distance ]
+            , div
+                [ class "event__distance-unit" ]
+                [ text "Mi" ]
             ]
         ]
 
