@@ -2,8 +2,19 @@ port module Main exposing (..)
 
 import Html exposing (..)
 import Navigation
-import Html.Attributes exposing (class, href, id)
-import Html.Events exposing (onClick)
+import Html.Attributes
+    exposing
+        ( class
+        , href
+        , id
+        , type_
+        , placeholder
+        , value
+        , step
+        , classList
+        , disabled
+        )
+import Html.Events exposing (onClick, onInput)
 import Date exposing (..)
 import Task exposing (..)
 import Geolocation exposing (..)
@@ -45,6 +56,7 @@ type alias Model =
     , endTime : Maybe Date
     , itinerary : Maybe (Array Place)
     , placeOpen : Maybe Int
+    , sliderTime : Float
     }
 
 
@@ -56,6 +68,7 @@ defaultModel =
         Nothing
         Nothing
         Nothing
+        0.5
 
 
 init : Navigation.Location -> ( Model, Cmd Msg )
@@ -76,10 +89,11 @@ type Msg
     = GetInitialDate Date
     | GetInitialLocation (Result Error Location)
     | GetItinerary (Result Http.Error (List Place))
-    | SetEndDate String
     | InputSearch String
     | UrlChange Navigation.Location
     | TogglePlaceDescription Int
+    | ChangeSlider Float
+    | SubmitEndTime
     | NoOp
 
 
@@ -99,7 +113,7 @@ update msg model =
                 newModel =
                     { model | location = Just location }
             in
-                newModel ! [ getItinerary newModel ]
+                newModel ! []
 
         GetInitialLocation (Err error) ->
             { model | location = Nothing } ! []
@@ -120,8 +134,15 @@ update msg model =
         UrlChange location ->
             model ! []
 
-        SetEndDate time ->
-            model ! []
+        ChangeSlider interval ->
+            let
+                _ =
+                    Debug.log "interval" interval
+            in
+                if not <| interval == model.sliderTime then
+                    { model | sliderTime = interval } ! []
+                else
+                    model ! []
 
         TogglePlaceDescription idx ->
             case model.placeOpen of
@@ -133,6 +154,14 @@ update msg model =
 
                 Nothing ->
                     { model | placeOpen = Just idx } ! [ sendMapCmd idx model.location ]
+
+        SubmitEndTime ->
+            case model.startTime of
+                Just startTime ->
+                    { model | endTime = Just <| Date.fromTime <| (Date.toTime startTime) + (360000 * model.sliderTime) } ! [ getItinerary model ]
+
+                Nothing ->
+                    model ! []
 
         NoOp ->
             model ! []
@@ -152,6 +181,18 @@ sendMapCmd idx location =
 -- # View
 
 
+noBubble : Html.Events.Options
+noBubble =
+    { stopPropagation = True
+    , preventDefault = True
+    }
+
+
+onClickNoBubble : msg -> Html.Attribute msg
+onClickNoBubble msg =
+    Html.Events.onWithOptions "click" noBubble (Json.Decode.succeed msg)
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
@@ -166,9 +207,94 @@ view model =
                 ]
 
         Nothing ->
-            div []
-                [ div [] [ text "Loading..." ]
-                ]
+            let
+                submitBtn =
+                    case model.location of
+                        Just _ ->
+                            button
+                                [ class "landing__btn", onClickNoBubble SubmitEndTime ]
+                                [ text "Submit" ]
+
+                        Nothing ->
+                            button
+                                [ class "landing__btn", disabled True ]
+                                [ text "Loading..." ]
+            in
+                div
+                    [ class "landing" ]
+                    [ div
+                        [ class "landing__title" ]
+                        [ text "Hackavelli" ]
+                    , div
+                        [ class "landing__form" ]
+                        [ div [ class "landing__ttk" ]
+                            [ div [ class "landing__time-label" ]
+                                [ text "Time to kill:"
+                                , input
+                                    [ class "landing__time"
+                                    , type_ "text"
+                                    , placeholder "Hours"
+                                    , value <| toString model.sliderTime
+                                    , onInput (ChangeSlider << Result.withDefault 0.5 << String.toFloat)
+                                    ]
+                                    []
+                                ]
+                            ]
+                        , div [ class "slider__container" ]
+                            [ div
+                                [ class "slider__rotate-container" ]
+                                [ div
+                                    [ class "slider__input-container" ]
+                                    [ div
+                                        [ class "slider--track-fill" ]
+                                        []
+                                    , input
+                                        [ class "slider"
+                                        , type_ "range"
+                                        , Html.Attributes.min "0.5"
+                                        , Html.Attributes.max "8"
+                                        , step "0.5"
+                                        , value <| toString model.sliderTime
+                                        , onInput (ChangeSlider << Result.withDefault 0.5 << String.toFloat)
+                                        ]
+                                        []
+                                    ]
+                                , div
+                                    [ class "slider__key" ]
+                                    [ div
+                                        [ class "slider__key-label" ]
+                                        [ div [] []
+                                        , span [] [ text "1/2 hour" ]
+                                        ]
+                                    , div
+                                        [ classList [ ( "slider__key-label", True ), ( "slider--two-hr", True ) ] ]
+                                        [ div [] []
+                                        , span [] [ text "2 hours" ]
+                                        ]
+                                    , div
+                                        [ classList [ ( "slider__key-label", True ), ( "slider--four-hr", True ) ] ]
+                                        [ div [] []
+                                        , span [] [ text "4 hours" ]
+                                        ]
+                                    , div
+                                        [ classList [ ( "slider__key-label", True ), ( "slider--six-hr", True ) ] ]
+                                        [ div [] []
+                                        , span [] [ text "6 hours" ]
+                                        ]
+                                    , div
+                                        [ classList [ ( "slider__key-label", True ), ( "slider--eight-hr", True ) ] ]
+                                        [ div [] []
+                                        , span [] [ text "8 hours" ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        , submitBtn
+                        ]
+                    , div
+                        [ class "landing__description" ]
+                        []
+                    ]
 
 
 type alias Itinerary =
