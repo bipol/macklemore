@@ -33,7 +33,7 @@
   }
 
   &__rotate-container {
-      transform: rotate(90deg);
+    transform: rotate(90deg);
 
   }
 
@@ -100,6 +100,27 @@
     background-color: $brand-gold;
     z-index: 2;
 
+  }
+
+  @media #{$viewport-lg} {
+
+    &__container {
+      height: auto;
+      padding: 50px 15px;
+    }
+
+    &__rotate-container {
+      transform: none;
+
+    }
+
+    &__key-label {
+      justify-content: flex-start;
+      span {
+        transform: none;
+
+      }
+    }
   }
 
 
