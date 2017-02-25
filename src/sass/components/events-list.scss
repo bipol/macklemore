@@ -14,6 +14,7 @@
 
   &__duration {
     width: 12%;
+    height: 65px;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
@@ -23,16 +24,28 @@
     border-right: 1px solid $brand-gold;
   }
 
-  &__duration-value {
+  &__distance {
+    width: 12%;
+    display: flex;
+    height: 65px;
+    flex-flow: column nowrap;
+    align-items: center;
+    color: $brand-gold;
+    font-weight: bold;
+    justify-content: center;
+    border-left: 1px solid $brand-red;
+  }
+
+  &__duration-value, &__distance-value {
     font-size: 18px;
   }
 
-  &__duration-unit {
+  &__duration-unit, &__distance-unit {
     font-size: 12px;
   }
 
   &__meta {
-    width: 85%;
+    width: 70%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
@@ -60,11 +73,11 @@
 
   @media #{$viewport-med} {
 
-    &__duration-value {
+    &__duration-value, &__distance-value {
       font-size: 20px;
     }
 
-    &__duration-unit {
+    &__duration-unit, &__distance-unit {
       font-size: 14px;
     }
 
@@ -90,16 +103,16 @@
 
   @media #{$viewport-lg} {
 
-    &__duration-value {
+    &__duration-value, &__distance-value {
       font-size: 24px;
     }
 
-    &__duration-unit {
+    &__duration-unit, &__distance-unit {
       font-size: 16px;
     }
 
     &__meta {
-      width: 85%;
+      flex: 1 1 auto;
       display: flex;
       flex-flow: column nowrap;
       justify-content: center;
