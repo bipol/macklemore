@@ -8,7 +8,8 @@
     "build": "elm make --yes --debug src/Main.elm --output public/built/index.js",
     "watch": "nodemon --watch src --ext elm --exec 'npm run -s build'",
     "serve": "cd public && browser-sync start --server --files \"built/*.js, *.css\"",
-    "start": "run-p serve watch"
+    "dev": "run-p serve watch",
+    "start": "elm make --yes --debug src/Main.elm --output public/built/index.js && node server.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,8 @@
   "homepage": "https://github.com/splodingsocks/elm-starter#readme",
   "dependencies": {
     "cors": "^2.8.1",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "browser-sync": "2.18.6",
