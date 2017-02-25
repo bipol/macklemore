@@ -75,11 +75,11 @@ defaultModel =
 
 defaultActivityList : List ( String, String )
 defaultActivityList =
-    [ ( "Dinner", "fa-film" )
+    [ ( "Dinner", "fa-cutlery" )
     , ( "Movie", "fa-film" )
-    , ( "Park", "fa-cc-diners-club" )
+    , ( "Park", "fa-leaf" )
     , ( "Bar", "fa-beer" )
-    , ( "Club", "fa-cc-diners-club" )
+    , ( "Club", "fa-music" )
     , ( "Sports", "fa-soccer-ball-o" )
     ]
 
