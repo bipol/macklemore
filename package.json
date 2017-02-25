@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo 'No tests, sorry!'",
-    "build": "elm make --yes --debug src/Main.elm --output public/built/index.js",
+    "build": "elm make --yes src/Main.elm --output public/built/index.js",
     "watch": "nodemon --watch src --ext elm --exec 'npm run -s build'",
     "serve": "cd public && browser-sync start --server --files \"built/*.js, *.css\"",
     "dev": "run-p serve watch",
-    "start": "elm make --yes --debug src/Main.elm --output public/built/index.js && node server.js"
+    "start": "elm make --yes src/Main.elm --output public/built/index.js && node server.js"
   },
   "repository": {
     "type": "git",
