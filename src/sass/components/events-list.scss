@@ -56,12 +56,24 @@
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 5px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    .fa-exchange {
+      margin: 0 15px 0 10px;
+      font-size: 20px;
+    }
   }
 
   &__location {
     margin-bottom: 5px;
 
-    .fa {
+    .icon {
+      font-size: 16px;
+      width: 26px;
+      height: 26px;
       margin-left: 15px;
     }
   }
@@ -83,25 +95,28 @@
 
   &--gold-line {
 
-    .event__location {
+    .event__location, .fa-exchange {
       color: rgba(247, 205, 48, 1);
     }
   }
 
   &--blue-line {
-    .event__location {
+
+    .event__location, .fa-exchange {
       color: rgba(62, 120, 218, 1);
     }
   }
 
   &--red-line {
-    .event__location {
+
+    .event__location, .fa-exchange {
       color: rgba(232, 25, 25, 1);
     }
   }
 
   &--green-line {
-    .event__location {
+
+    .event__location, .fa-exchange {
       color: rgba(39, 148, 156, 1);
     }
   }
