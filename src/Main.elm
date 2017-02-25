@@ -20,7 +20,7 @@ import Task exposing (..)
 import Geolocation exposing (..)
 import List exposing (..)
 import Json.Encode
-import Json.Decode exposing (string, Decoder, bool, int, float)
+import Json.Decode exposing (string, Decoder, bool, int, float, list)
 import Json.Decode.Pipeline exposing (..)
 import Http
 import Array exposing (Array)
@@ -178,6 +178,24 @@ sendMapCmd idx location =
 -- # View
 
 
+getLineClass : List String -> String
+getLineClass lines =
+    case List.head lines of
+        Just aLine ->
+            case aLine of
+                "RED" ->
+                    "event--red-line"
+
+                "GOLD" ->
+                    "event--gold-line"
+
+                _ ->
+                    "event--gold-line"
+
+        Nothing ->
+            "event--gold-line"
+
+
 noBubble : Html.Events.Options
 noBubble =
     { stopPropagation = True
@@ -219,6 +237,7 @@ type alias PlaceLocation =
     { address : String
     , lat : Float
     , long : Float
+    , line : List String
     }
 
 
@@ -233,6 +252,9 @@ encodeGoogleUrl placeLocation =
 placeCard : Maybe Int -> Int -> Place -> ( String, Html Msg )
 placeCard currOpen idx place =
     let
+        lineClass =
+            getLineClass place.location.line
+
         descBox =
             div [ id <| "map" ++ toString idx ] []
 
@@ -249,7 +271,7 @@ placeCard currOpen idx place =
     in
         ( toString idx
         , div
-            [ class "event"
+            [ classList [ ( "event", True ), ( lineClass, True ) ]
             ]
             [ div
                 [ class "event__duration" ]
@@ -307,7 +329,8 @@ activityButton currSelected ( activity, icon ) =
             , attribute "data-bw" activity
             , onClick <| AddActivity activity
             ]
-            [ span [ class "activities__order" ] [ text activity ]
+            [ div [ class "activities__order" ] []
+            , span [] [ text activity ]
             , i [ classList [ ( "fa", True ), ( icon, True ) ] ] []
             ]
         )
@@ -323,25 +346,29 @@ carouselView model =
                         goHunting =
                             List.isEmpty model.selectedActivities
                     in
-                        Html.Keyed.node "div"
-                            [ class "carousel" ]
-                            [ ( "first-node"
-                              , div
-                                    [ class "carousel__slide" ]
-                                    [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
-                                    , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
-                                    , button
-                                        [ class "carousel__next-btn"
-                                        , onClickNoBubble SubmitActivity
-                                        , disabled goHunting
+                        div [ class "carousel__container" ] <|
+                            [ Html.Keyed.node "div"
+                                [ classList [ ( "carousel", True ), ( "carousel--second-slide", True ) ] ]
+                                [ ( "first-node"
+                                  , div
+                                        [ class "carousel__slide" ]
+                                        [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
+                                        , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
+                                        , button
+                                            [ class "carousel__next-btn"
+                                            , onClickNoBubble SubmitActivity
+                                            , disabled goHunting
+                                            ]
+                                            [ span [] [ text "Let's Go Hunting" ]
+                                            , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
+                                                []
+                                            ]
                                         ]
-                                        [ span [] [ text "Let's Go Hunting" ]
-                                        , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
-                                            []
-                                        ]
-                                    ]
-                              )
-                            , ( "second-node", itineraryView itinerary model.placeOpen )
+                                  )
+                                , ( "second-node"
+                                  , div [ class "carousel__slide" ] [ itineraryView itinerary model.placeOpen ]
+                                  )
+                                ]
                             ]
 
                 Nothing ->
@@ -354,25 +381,29 @@ carouselView model =
                                 Nothing ->
                                     True
                     in
-                        Html.Keyed.node "div"
-                            [ class "carousel" ]
-                            [ ( "first-node"
-                              , div
-                                    [ class "carousel__slide" ]
-                                    [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
-                                    , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
-                                    , button
-                                        [ class "carousel__next-btn"
-                                        , onClickNoBubble SubmitActivity
-                                        , disabled goHunting
+                        div [ class "carousel__container" ] <|
+                            [ Html.Keyed.node "div"
+                                [ class "carousel" ]
+                                [ ( "first-node"
+                                  , div
+                                        [ class "carousel__slide" ]
+                                        [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
+                                        , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
+                                        , button
+                                            [ class "carousel__next-btn"
+                                            , onClickNoBubble SubmitActivity
+                                            , disabled goHunting
+                                            ]
+                                            [ span [] [ text "Let's Go Hunting" ]
+                                            , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
+                                                []
+                                            ]
                                         ]
-                                        [ span [] [ text "Let's Go Hunting" ]
-                                        , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
-                                            []
-                                        ]
-                                    ]
-                              )
-                            , ( "second-node", itineraryView Array.empty Nothing )
+                                  )
+                                , ( "second-node"
+                                  , div [ class "carousel__slide" ] [ itineraryView Array.empty Nothing ]
+                                  )
+                                ]
                             ]
     in
         view
@@ -411,6 +442,7 @@ decodePlaceLocation =
         |> required "address" string
         |> required "lat" float
         |> required "long" float
+        |> required "line" (list string)
 
 
 decodePlace : Decoder Place
@@ -431,6 +463,6 @@ type alias ItineraryRequest =
 encodeItineraryRequest : ItineraryRequest -> Json.Encode.Value
 encodeItineraryRequest record =
     Json.Encode.object
-        [ ( "start_point", Json.Encode.string <| record.start_point )
+        [ ( "start_point", Json.Encode.string <| "848 Spring St. Atlanta, GA" )
         , ( "activities", Json.Encode.list <| List.map Json.Encode.string record.activities )
         ]
