@@ -5,12 +5,34 @@
     <link rel="stylesheet" href="vendor/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway" />
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
   </head>
 
   <body>
     <div id="app"></div>
     <script>
-      Elm.Main.embed(document.getElementById("app"))
+      var app = Elm.Main.embed(document.getElementById("app"));
+      var mapPool = [];
+      app.ports.createMap.subscribe(function(latLng) {
+        mapPool[latLng[2]] = L.map('map' + latLng[2], {
+            center: [latLng[0], latLng[1]],
+            zoom: 13
+        });
+      L.tileLayer('https://api.mapbox.com/styles/v1/bipol/cizktvgsl000j2rnymunwxysv/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlwb2wiLCJhIjoiY2l3ZnA3aW1uMDBneTJ0bW5keDY2ajdrcCJ9.gX1FjabR6OFkb0Rj9Uxi9A', {
+            maxZoom: 18,
+            id: 'bipol.cizktvgsl000j2rnymunwxysv',
+            accessToken: 'pk.eyJ1IjoiYmlwb2wiLCJhIjoiY2l3ZnA3aW1uMDBneTJ0bW5keDY2ajdrcCJ9.gX1FjabR6OFkb0Rj9Uxi9A'
+        }).addTo(mapPool[latLng[2]]);
+        console.log("map " + latLng[2] + " created.");
+        L.marker([latLng[0], latLng[1]]).addTo(mapPool[latLng[2]]);
+      });
+
+      app.ports.destroyMap.subscribe(function(idx) {
+        mapPool[idx].remove();
+        console.log("map " + idx + " destroyed.");
+      });
+
     </script>
   </body>
 </html>
