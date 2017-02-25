@@ -6,7 +6,7 @@ import Date exposing (..)
 import Task exposing (..)
 import Geolocation exposing (..)
 import List exposing (..)
-import Json.Decode exposing (string, Decoder, bool)
+import Json.Decode exposing (string, Decoder, bool, int, float)
 import Json.Decode.Pipeline exposing (..)
 import Http
 
@@ -62,7 +62,7 @@ init =
 type Msg
     = GetInitialDate Date
     | GetInitialLocation (Result Error Location)
-    | GetItinerary (Result Http.Error Itinerary)
+    | GetItinerary (Result Http.Error (List Place))
     | InputSearch String
     | NoOp
 
@@ -84,10 +84,14 @@ update msg model =
             { model | location = Nothing } ! []
 
         GetItinerary (Ok itinerary) ->
-            { model | itinerary = Just itinerary.list } ! []
+            { model | itinerary = Just itinerary } ! []
 
         GetItinerary (Err error) ->
-            model ! []
+            let
+                something =
+                    Debug.log "Error" <| toString error
+            in
+                model ! []
 
         InputSearch string ->
             model ! []
@@ -132,8 +136,17 @@ type alias Itinerary =
 
 type alias Place =
     { title : String
-    , eventTime : Date
-    , location : String
+    , description : String
+    , distance : Int
+    , event_time : Date
+    , location : PlaceLocation
+    }
+
+
+type alias PlaceLocation =
+    { address : String
+    , lat : Int
+    , long : Int
     }
 
 
@@ -147,19 +160,51 @@ defaultDate =
             Debug.crash "Invalid Date"
 
 
+
+--                   <div class="event">
+--        <div class="event__duration">
+--            <div class="event__duration-value">2</div>
+--            <div class="event__duration-unit">HR</div>
+--        </div>
+--        <div class="event__meta">
+--            <div class="event__title">Tummy Sticks</div>
+--            <div class="event__location">Cypress Street Pint and Place</div>
+--            <div class="event__time-block">1:00PM-3:00pm</div>
+--        </div>
+--    </div>
+
+
 placeCard : Place -> Html Msg
 placeCard place =
     div
-        [ class "container" ]
-        [ p [] [ text place.title ]
-        , p [] [ text <| toString place.eventTime ]
-        , p [] [ text place.location ]
+        [ class "event" ]
+        [ div
+            [ class "event__duration" ]
+            [ div
+                [ class "event__duration-value" ]
+                [ text "2" ]
+            , div
+                [ class "event__duration-unit" ]
+                [ text "HR" ]
+            ]
+        , div
+            [ class "event__meta" ]
+            [ div
+                [ class "event__title" ]
+                [ text place.title ]
+            , div
+                [ class "event__location" ]
+                [ text place.location.address ]
+            , div
+                [ class "event__time-block" ]
+                [ text <| toString place.event_time ]
+            ]
         ]
 
 
 itineraryView : List Place -> Html Msg
 itineraryView places =
-    div [] <|
+    div [ class "list" ] <|
         List.map
             placeCard
             places
@@ -177,18 +222,22 @@ urlBuilder parts =
 getItinerary : Cmd Msg
 getItinerary =
     Http.send GetItinerary <|
-        Http.get "http://localhost:3002/api/itinerary" decodeItinerary
+        Http.get "http://localhost:3002/api/itinerary" (Json.Decode.list decodePlace)
 
 
-decodeItinerary : Decoder Itinerary
-decodeItinerary =
-    decode Itinerary
-        |> requiredAt [ "itinerary" ] (Json.Decode.list decodePlace)
+decodePlaceLocation : Decoder PlaceLocation
+decodePlaceLocation =
+    decode PlaceLocation
+        |> required "address" string
+        |> required "lat" int
+        |> required "long" int
 
 
 decodePlace : Decoder Place
 decodePlace =
     decode Place
         |> required "title" string
-        |> required "eventTime" (Json.Decode.map (Result.withDefault defaultDate << Date.fromString) string)
-        |> required "location" string
+        |> required "description" string
+        |> required "distance" int
+        |> required "event_time" (Json.Decode.map Date.fromTime float)
+        |> required "location" decodePlaceLocation

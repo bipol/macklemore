@@ -4,35 +4,53 @@ const app = express();
 app.use(cors());
 
 app.get('/api/itinerary', (req, res) => {
-    data = {
-        "itinerary" :
+    data = 
         [
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            },
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            },
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            },
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            },
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            },
-            { "title" : "Test",
-              "eventTime" : "2017-02-25 00:45:07 UTC",
-              "location" : "Macklemore's Home"
-            }
-        ]
-    }
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+		]
     res.json(data);
 });
 
