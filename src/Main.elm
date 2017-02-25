@@ -14,6 +14,7 @@ import Html.Attributes
         , classList
         , disabled
         , attribute
+        , src
         )
 import Html.Events exposing (onClick, onInput, onMouseDown)
 import Geolocation exposing (..)
@@ -57,6 +58,7 @@ type alias Model =
     , itinerary : Maybe (Array Place)
     , placeOpen : Maybe Int
     , selectedActivities : List String
+    , isAjax : Bool
     }
 
 
@@ -67,6 +69,7 @@ defaultModel =
         Nothing
         Nothing
         []
+        False
 
 
 defaultActivityList : List ( String, String )
@@ -145,7 +148,7 @@ update msg model =
             model ! []
 
         SubmitActivity ->
-            model ! [ getItinerary model ]
+            { model | isAjax = True } ! [ getItinerary model ]
 
         TogglePlaceDescription idx ->
             case model.placeOpen of
@@ -373,10 +376,16 @@ carouselView model =
                     let
                         goHunting =
                             List.isEmpty model.selectedActivities
+
+                        moveOver =
+                            if model.isAjax then
+                                ( "carousel--second-slide", True )
+                            else
+                                ( "", False )
                     in
                         div [ class "carousel__container" ] <|
                             [ Html.Keyed.node "div"
-                                [ class "carousel" ]
+                                [ classList [ ( "carousel", True ), moveOver ] ]
                                 [ ( "first-node"
                                   , div
                                         [ class "carousel__slide" ]
@@ -394,7 +403,14 @@ carouselView model =
                                         ]
                                   )
                                 , ( "second-node"
-                                  , div [ class "carousel__slide" ] [ itineraryView Array.empty Nothing ]
+                                  , div [ class "carousel__slide" ]
+                                        [ div
+                                            [ class "carousel__spinner" ]
+                                            [ img
+                                                [ src "img/loading.gif" ]
+                                                []
+                                            ]
+                                        ]
                                   )
                                 ]
                             ]
@@ -414,16 +430,8 @@ urlBuilder parts =
 getItinerary : Model -> Cmd Msg
 getItinerary model =
     let
-        currLocation =
-            case model.location of
-                Just location ->
-                    (toString location.longitude) ++ ", " ++ (toString location.latitude)
-
-                Nothing ->
-                    Debug.crash "location isn't loaded"
-
         body =
-            Http.jsonBody (encodeItineraryRequest (ItineraryRequest currLocation model.selectedActivities))
+            Http.jsonBody (encodeItineraryRequest (ItineraryRequest "DONT" model.selectedActivities))
     in
         Http.send GetItinerary <|
             Http.post "https://malone-api.herokuapp.com/api/itinerary" body (Json.Decode.list decodePlace)
