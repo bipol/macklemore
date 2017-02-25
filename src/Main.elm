@@ -13,8 +13,9 @@ import Html.Attributes
         , step
         , classList
         , disabled
+        , attribute
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onMouseDown)
 import Task exposing (..)
 import Geolocation exposing (..)
 import List exposing (..)
@@ -23,6 +24,7 @@ import Json.Decode exposing (string, Decoder, bool, int, float)
 import Json.Decode.Pipeline exposing (..)
 import Http
 import Array exposing (Array)
+import Html.Keyed
 
 
 -- # Main
@@ -42,6 +44,9 @@ port createMap : ( Float, Float, Int ) -> Cmd msg
 
 
 port destroyMap : Int -> Cmd msg
+
+
+port createCarousel : Int -> Cmd msg
 
 
 
@@ -65,14 +70,14 @@ defaultModel =
         []
 
 
-defaultActivityList : List String
+defaultActivityList : List ( String, String )
 defaultActivityList =
-    [ "Dinner"
-    , "Movie"
-    , "Park"
-    , "Bar"
-    , "Club"
-    , "Sports"
+    [ ( "Dinner", "fa-film" )
+    , ( "Movie", "fa-film" )
+    , ( "Park", "fa-cc-diners-club" )
+    , ( "Bar", "fa-beer" )
+    , ( "Club", "fa-cc-diners-club" )
+    , ( "Sports", "fa-soccer-ball-o" )
     ]
 
 
@@ -81,6 +86,7 @@ init location =
     defaultModel
         ! [ Cmd.batch
                 [ Task.attempt GetInitialLocation Geolocation.now
+                , createCarousel 1
                 ]
           ]
 
@@ -95,6 +101,7 @@ type Msg
     | UrlChange Navigation.Location
     | TogglePlaceDescription Int
     | AddActivity String
+    | SubmitActivity
     | NoOp
 
 
@@ -129,12 +136,18 @@ update msg model =
         AddActivity activity ->
             let
                 activities =
-                    List.append model.selectedActivities [ activity ]
+                    if List.member activity model.selectedActivities then
+                        List.filter (\e -> not <| e == activity) model.selectedActivities
+                    else
+                        List.append model.selectedActivities [ activity ]
             in
                 { model | selectedActivities = activities } ! []
 
         UrlChange location ->
             model ! []
+
+        SubmitActivity ->
+            model ! [ getItinerary model ]
 
         TogglePlaceDescription idx ->
             case model.placeOpen of
@@ -184,16 +197,9 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    case model.itinerary of
-        Just itinerary ->
-            div []
-                [ itineraryView itinerary model.placeOpen
-                ]
-
-        Nothing ->
-            div
-                []
-                [ text "Loading..." ]
+    div
+        []
+        [ carouselView model ]
 
 
 type alias Itinerary =
@@ -224,7 +230,7 @@ encodeGoogleUrl placeLocation =
         ++ toString placeLocation.long
 
 
-placeCard : Maybe Int -> Int -> Place -> Html Msg
+placeCard : Maybe Int -> Int -> Place -> ( String, Html Msg )
 placeCard currOpen idx place =
     let
         descBox =
@@ -241,9 +247,9 @@ placeCard currOpen idx place =
         --                Nothing ->
         --                    span [] []
     in
-        div
+        ( toString idx
+        , div
             [ class "event"
-            , onClick <| TogglePlaceDescription idx
             ]
             [ div
                 [ class "event__duration" ]
@@ -274,15 +280,99 @@ placeCard currOpen idx place =
                 ]
             , descBox
             ]
+        )
 
 
 itineraryView : Array Place -> Maybe Int -> Html Msg
 itineraryView places currSel =
-    div [ class "list" ] <|
+    Html.Keyed.node "div" [ class "list" ] <|
         Array.toList <|
             Array.indexedMap
                 (placeCard currSel)
                 places
+
+
+activityButton : List String -> ( String, String ) -> ( String, Html Msg )
+activityButton currSelected ( activity, icon ) =
+    let
+        isSelected =
+            List.member activity currSelected
+    in
+        ( activity
+        , button
+            [ classList [ ( "activities__btn", True ), ( "selected", isSelected ) ]
+            , attribute "data-bw" activity
+            , onClick <| AddActivity activity
+            ]
+            [ span [ class "activities__order" ] [ text activity ]
+            , i [ classList [ ( "fa", True ), ( icon, True ) ] ] []
+            ]
+        )
+
+
+carouselView : Model -> Html Msg
+carouselView model =
+    let
+        view =
+            case model.itinerary of
+                Just itinerary ->
+                    let
+                        goHunting =
+                            List.isEmpty model.selectedActivities
+                    in
+                        Html.Keyed.node "div"
+                            [ class "carousel" ]
+                            [ ( "first-node"
+                              , div
+                                    [ class "carousel__slide" ]
+                                    [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
+                                    , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
+                                    , button
+                                        [ class "carousel__next-btn"
+                                        , onClickNoBubble SubmitActivity
+                                        , disabled goHunting
+                                        ]
+                                        [ span [] [ text "Let's Go Hunting" ]
+                                        , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
+                                            []
+                                        ]
+                                    ]
+                              )
+                            , ( "second-node", itineraryView itinerary model.placeOpen )
+                            ]
+
+                Nothing ->
+                    let
+                        goHunting =
+                            case model.location of
+                                Just location ->
+                                    List.isEmpty model.selectedActivities
+
+                                Nothing ->
+                                    True
+                    in
+                        Html.Keyed.node "div"
+                            [ class "carousel" ]
+                            [ ( "first-node"
+                              , div
+                                    [ class "carousel__slide" ]
+                                    [ div [ class "carousel__slide-title" ] [ text "What are you getting into?" ]
+                                    , (Html.Keyed.node "div" [ class "activities" ] <| List.map (activityButton model.selectedActivities) defaultActivityList)
+                                    , button
+                                        [ class "carousel__next-btn"
+                                        , onClickNoBubble SubmitActivity
+                                        , disabled goHunting
+                                        ]
+                                        [ span [] [ text "Let's Go Hunting" ]
+                                        , i [ classList [ ( "fa", True ), ( "fa-chevron-right", True ) ] ]
+                                            []
+                                        ]
+                                    ]
+                              )
+                            , ( "second-node", itineraryView Array.empty Nothing )
+                            ]
+    in
+        view
 
 
 
@@ -339,5 +429,5 @@ encodeItineraryRequest : ItineraryRequest -> Json.Encode.Value
 encodeItineraryRequest record =
     Json.Encode.object
         [ ( "start_point", Json.Encode.string <| record.start_point )
-        , ( "activies", Json.Encode.list <| List.map Json.Encode.string record.activities )
+        , ( "activities", Json.Encode.list <| List.map Json.Encode.string record.activities )
         ]
