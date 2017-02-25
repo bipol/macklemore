@@ -16,7 +16,6 @@ import Html.Attributes
         , attribute
         )
 import Html.Events exposing (onClick, onInput, onMouseDown)
-import Task exposing (..)
 import Geolocation exposing (..)
 import List exposing (..)
 import Json.Encode
@@ -85,8 +84,7 @@ init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
     defaultModel
         ! [ Cmd.batch
-                [ Task.attempt GetInitialLocation Geolocation.now
-                , createCarousel 1
+                [ createCarousel 1
                 ]
           ]
 
@@ -374,12 +372,7 @@ carouselView model =
                 Nothing ->
                     let
                         goHunting =
-                            case model.location of
-                                Just location ->
-                                    List.isEmpty model.selectedActivities
-
-                                Nothing ->
-                                    True
+                            List.isEmpty model.selectedActivities
                     in
                         div [ class "carousel__container" ] <|
                             [ Html.Keyed.node "div"
