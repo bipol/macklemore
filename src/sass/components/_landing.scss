@@ -1,0 +1,55 @@
+.landing {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+
+  &__title {
+    font-size: 24px;
+    color: $brand-red;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  &__form {
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+  }
+
+  &__ttk {            // time to kill
+      width: 100%;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+
+  }
+
+  &__time-label {
+    margin-left: 35px;
+  }
+
+  &__time {
+    padding: 5px 10px 5px 20px;
+    width: 77px;
+    height: 70px;
+    font-size: 16px;
+    color: $brand-red;
+  }
+
+  &__btn {
+    margin: 20px 0;
+    padding: 25px 35px;
+    box-sizing: border-box;
+    background-color: $brand-red;
+    border: 1px solid $brand-gold;
+    color: #FFF;
+    width: 100%;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+
+
+}

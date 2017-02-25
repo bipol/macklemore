@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway" />
     <link rel="stylesheet" type="text/css" href="../../public/main.css">
 </head>
@@ -7,18 +8,36 @@
 
 <section>
     <div class="landing">
-        <div class="landing__title"></div>
-        <div class="landing__description"></div>
+        <div class="landing__title">Hackavelli</div>
         <form class="landing__form">
-            <div class="landing__inputs">
-                <input class="landing__time" type="text" placeholder="start">
-                <input class="landing__time"  type="text" placeholder="end">
-                <input class="landing__btn" type="submit">
+            <div class="landing__ttk">
+                <div class="landing__time-label">Time to kill:</div>
+                <input class="landing__time" type="text" placeholder="Hours" value="0.5">
             </div>
-        </form>
-        <div class="landing__slider">
 
-        </div>
+            <div class="slider__container">
+                <div class="slider__rotate-container">
+                    <div class="slider__input-container">
+                        <div class="slider--track-fill"></div>
+                        <input class="slider" type="range" min=0.5 max=8 step=0.5 value=0.5 >
+                    </div>
+                    <div class="slider__key">
+                        <div class="slider__key-label"><div></div><span>1/2 hour</span></div>
+                        <div class="slider__key-label slider--two-hr"><div></div><span>2 hours</span></div>
+                        <div class="slider__key-label slider--four-hr"><div></div><span>4 hours</span></div>
+                        <div class="slider__key-label slider--six-hr"><div></div><span>6 hours</span></div>
+                        <div class="slider__key-label slider--eight-hr"><div></div><span>8 hours</span></div>
+                    </div>
+                </div>
+            </div>
+            <input class="landing__btn" type="submit" value="Submit">
+        </form>
+
+
+
+
+        <div class="landing__description"></div>
+
 
     </div>
 
