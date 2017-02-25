@@ -1,10 +1,15 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Navigation
 import Html.Attributes exposing (class)
 import Date exposing (..)
 import Task exposing (..)
 import Geolocation exposing (..)
+import List exposing (..)
+import Json.Decode exposing (string, Decoder, bool, int, float)
+import Json.Decode.Pipeline exposing (..)
+import Http
 
 
 -- # Main
@@ -12,7 +17,7 @@ import Geolocation exposing (..)
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program UrlChange
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -28,6 +33,7 @@ type alias Model =
     { location : Maybe Location
     , startTime : Maybe Date
     , endTime : Maybe Date
+    , itinerary : Maybe (List Place)
     }
 
 
@@ -37,10 +43,11 @@ defaultModel =
         Nothing
         Nothing
         Nothing
+        Nothing
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Navigation.Location -> ( Model, Cmd Msg )
+init location =
     defaultModel
         ! [ Cmd.batch
                 [ Task.perform GetInitialDate Date.now
@@ -56,7 +63,10 @@ init =
 type Msg
     = GetInitialDate Date
     | GetInitialLocation (Result Error Location)
+    | GetItinerary (Result Http.Error (List Place))
+    | SetEndDate String
     | InputSearch String
+    | UrlChange Navigation.Location
     | NoOp
 
 
@@ -71,12 +81,24 @@ update msg model =
             { model | startTime = Just date } ! []
 
         GetInitialLocation (Ok location) ->
-            { model | location = Just location } ! []
+            { model | location = Just location } ! [ getItinerary ]
 
-        GetInitialLocation (Err location) ->
+        GetInitialLocation (Err error) ->
             { model | location = Nothing } ! []
 
+        GetItinerary (Ok itinerary) ->
+            { model | itinerary = Just itinerary } ! []
+
+        GetItinerary (Err error) ->
+            model ! []
+
         InputSearch string ->
+            model ! []
+
+        UrlChange location ->
+            model ! []
+
+        SetEndDate time ->
             model ! []
 
         NoOp ->
@@ -94,28 +116,114 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "container" ]
-        [ h1 [] [ text "I <3 Macklemore" ]
-        , div [] [ text "Time: ", text (toString model.startTime) ]
-        , div [] [ text "Location: ", text (toString model.location) ]
-        ]
+    case model.itinerary of
+        Just itinerary ->
+            div []
+                [ itineraryView itinerary
+                ]
+
+        Nothing ->
+            div []
+                [ div [] [ text "Please turn on your JS stuff kthx" ]
+                , div [] [ text "Loading..." ]
+                ]
+
+
+type alias Itinerary =
+    { list : List Place
+    }
 
 
 type alias Place =
     { title : String
-    , eventTime : Date
-    , location : String
+    , description : String
+    , distance : Int
+    , event_time : Date
+    , location : PlaceLocation
     }
+
+
+type alias PlaceLocation =
+    { address : String
+    , lat : Int
+    , long : Int
+    }
+
+
+defaultDate : Date.Date
+defaultDate =
+    case Date.fromString "1970-01-01T00:00:00Z" of
+        Ok date ->
+            date
+
+        Err _ ->
+            Debug.crash "Invalid Date"
 
 
 placeCard : Place -> Html Msg
 placeCard place =
     div
-        []
-        []
+        [ class "event" ]
+        [ div
+            [ class "event__duration" ]
+            [ div
+                [ class "event__duration-value" ]
+                [ text "2" ]
+            , div
+                [ class "event__duration-unit" ]
+                [ text "HR" ]
+            ]
+        , div
+            [ class "event__meta" ]
+            [ div
+                [ class "event__title" ]
+                [ text place.title ]
+            , div
+                [ class "event__location" ]
+                [ text place.location.address ]
+            , div
+                [ class "event__time-block" ]
+                [ text <| toString place.event_time ]
+            ]
+        ]
 
 
-itinerary : List Place -> Html Msg
-itinerary places =
-    div []
-        []
+itineraryView : List Place -> Html Msg
+itineraryView places =
+    div [ class "list" ] <|
+        List.map
+            placeCard
+            places
+
+
+
+-- Rest Portion
+
+
+urlBuilder : List String -> String
+urlBuilder parts =
+    List.foldr (++) "" <| List.intersperse "/" parts
+
+
+getItinerary : Cmd Msg
+getItinerary =
+    Http.send GetItinerary <|
+        Http.get "http://localhost:3002/api/itinerary" (Json.Decode.list decodePlace)
+
+
+decodePlaceLocation : Decoder PlaceLocation
+decodePlaceLocation =
+    decode PlaceLocation
+        |> required "address" string
+        |> required "lat" int
+        |> required "long" int
+
+
+decodePlace : Decoder Place
+decodePlace =
+    decode Place
+        |> required "title" string
+        |> required "description" string
+        |> required "distance" int
+        |> required "event_time" (Json.Decode.map Date.fromTime float)
+        |> required "location" decodePlaceLocation
