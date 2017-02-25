@@ -16,6 +16,7 @@ import Html.Attributes
         , attribute
         , src
         )
+import Tuple exposing (..)
 import Html.Events exposing (onClick, onInput, onMouseDown)
 import Geolocation exposing (..)
 import List exposing (..)
@@ -284,7 +285,9 @@ placeCard currOpen idx place =
                 [ class "event__meta" ]
                 [ div
                     [ class "event__title" ]
-                    [ text place.title ]
+                    [ text place.title
+                    , i [ classList [ ( "fa", True ), ( "fa-exchange", True ) ] ] []
+                    ]
                 , div
                     [ class "event__location" ]
                     [ text place.location.address ]
@@ -323,6 +326,9 @@ activityButton currSelected ( activity, icon ) =
     let
         isSelected =
             List.member activity currSelected
+
+        idx =
+            Tuple.first <| Maybe.withDefault ( 0, "" ) <| List.head <| List.filter (\x -> Tuple.second x == activity) <| Array.toIndexedList <| Array.fromList currSelected
     in
         ( activity
         , button
@@ -330,7 +336,7 @@ activityButton currSelected ( activity, icon ) =
             , attribute "data-bw" activity
             , onClick <| AddActivity activity
             ]
-            [ div [ class "activities__order" ] []
+            [ div [ class "activities__order" ] [ text <| toString idx ]
             , span [] [ text activity ]
             , i [ classList [ ( "fa", True ), ( icon, True ) ] ] []
             ]
