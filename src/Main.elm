@@ -64,6 +64,7 @@ type Msg
     = GetInitialDate Date
     | GetInitialLocation (Result Error Location)
     | GetItinerary (Result Http.Error (List Place))
+    | SetEndDate String
     | InputSearch String
     | UrlChange Navigation.Location
     | NoOp
@@ -89,16 +90,15 @@ update msg model =
             { model | itinerary = Just itinerary } ! []
 
         GetItinerary (Err error) ->
-            let
-                something =
-                    Debug.log "Error" <| toString error
-            in
-                model ! []
+            model ! []
 
         InputSearch string ->
             model ! []
 
         UrlChange location ->
+            model ! []
+
+        SetEndDate time ->
             model ! []
 
         NoOp ->
@@ -118,19 +118,14 @@ view : Model -> Html Msg
 view model =
     case model.itinerary of
         Just itinerary ->
-            div [ class "container" ]
-                [ h1 [] [ text "pray4death" ]
-                , div [] [ text "Time: ", text (toString model.startTime) ]
-                , div [] [ text "Location: ", text (toString model.location) ]
-                , itineraryView itinerary
+            div []
+                [ itineraryView itinerary
                 ]
 
         Nothing ->
-            div [ class "container" ]
-                [ h1 [] [ text "pray4death" ]
-                , div [] [ text "Time: ", text (toString model.startTime) ]
-                , div [] [ text "Location: ", text (toString model.location) ]
-                , div [] [ text "Please turn on your JS stuff kthx" ]
+            div []
+                [ div [] [ text "Please turn on your JS stuff kthx" ]
+                , div [] [ text "Loading..." ]
                 ]
 
 
@@ -163,20 +158,6 @@ defaultDate =
 
         Err _ ->
             Debug.crash "Invalid Date"
-
-
-
---                   <div class="event">
---        <div class="event__duration">
---            <div class="event__duration-value">2</div>
---            <div class="event__duration-unit">HR</div>
---        </div>
---        <div class="event__meta">
---            <div class="event__title">Tummy Sticks</div>
---            <div class="event__location">Cypress Street Pint and Place</div>
---            <div class="event__time-block">1:00PM-3:00pm</div>
---        </div>
---    </div>
 
 
 placeCard : Place -> Html Msg

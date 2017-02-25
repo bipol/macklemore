@@ -50,6 +50,51 @@ app.get('/api/itinerary', (req, res) => {
 				  "long": 0
 				}
 			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+			{
+			   "title": "string",
+				"description": "string",
+				"distance": 0,
+				"event_time": 0,
+				"location": {
+                  "address" : "something",
+				  "lat": 0,
+				  "long": 0
+				}
+			},
+
 		]
     res.json(data);
 });
