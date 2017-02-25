@@ -8255,9 +8255,7 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                     this.activitySelectedCount = 0;
                     this.el = $('.carousel');
 
-                    $(document).ready(function () {
-                        $('.carousel').slick(Carousel.settings);
-                    });
+                    this.el.slick(Carousel.settings);
                 }
 
                 _createClass(Carousel, [{
@@ -8269,13 +8267,14 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                             e.preventDefault();
                             var btn = $(e.target());
 
+                            _this.el.trigger('activity.select', btn.data('kw'));
+
                             if (btn.hasClass('selected')) {
                                 btn.removeClass('selected');
                                 _this.activitySelectedCount--;
                             } else {
                                 btn.addClass('selected');
                                 _this.activitySelectedCount++;
-                                _this.el.trigger('activity.select', btn.data('kw'));
                             }
 
                             switch (_this.activitySelectedCount) {
