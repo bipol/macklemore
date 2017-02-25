@@ -8242,6 +8242,8 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
 
             Carousel = (function () {
                 function Carousel() {
+                    var _this = this;
+
                     _classCallCheck(this, Carousel);
 
                     Carousel.settings = {
@@ -8253,42 +8255,48 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                     };
 
                     this.activitySelectedCount = 0;
-                    this.el = $('.carousel');
 
                     $(document).ready(function (e) {
-                        $('.carousel').slick(Carousel.settings);
+                        _this.el = $('.carousel');
+                        _this.nextBtn = _this.el.find('.carousel__next-btn');
+                        _this.el.slick(Carousel.settings);
+                        _this.setupEvents();
                     });
                 }
 
                 _createClass(Carousel, [{
                     key: "setupEvents",
                     value: function setupEvents() {
-                        var _this = this;
+                        var _this2 = this;
 
-                        $('activity__btn').on('click', function (e) {
-                            e.preventDefault();
-                            var btn = $(e.target());
+                        var self = this;
+                        $('.activities__btn').on('click', function (e) {
+                            var btn = $(this);
 
-                            _this.el.trigger('activity.select', btn.data('kw'));
+                            console.log('click', btn);
+
+                            self.el.trigger('activity.select', btn.data('kw'));
 
                             if (btn.hasClass('selected')) {
                                 btn.removeClass('selected');
-                                _this.activitySelectedCount--;
+                                self.activitySelectedCount--;
                             } else {
                                 btn.addClass('selected');
-                                _this.activitySelectedCount++;
+                                self.activitySelectedCount++;
                             }
 
-                            switch (_this.activitySelectedCount) {
+                            switch (self.activitySelectedCount) {
 
                                 case 0:
-                                    _this.el.unslick();
+                                    self.nextBtn.attr('disabled', 'disabled');
                                     break;
                                 case 1:
-                                    _this.el.slick(Carousel.settings);
-                                    break;
-
+                                    self.nextBtn.removeAttr('disabled');
                             }
+                        });
+
+                        this.nextBtn.on('click', function (e) {
+                            _this2.el.slick('slickNext');
                         });
                     }
                 }, {

@@ -71,7 +71,7 @@ input {
 }
 
 button {
-
+  -webkit-appearance: none;
   &:focus {
     outline: none;
   }

@@ -5,6 +5,22 @@
   align-items: center;
   padding: 15px;
 
+  &__order {
+      position: absolute;
+      display: none;
+      top: 5px;
+      left: 5px;
+      font-size: 16px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid #FFF;
+      align-items: center;
+      justify-content: center;
+
+
+    }
+
   &__btn {
     display: flex;
     flex-flow: row nowrap;
@@ -17,7 +33,7 @@
     border: none;
     color: #FFF;
     margin-bottom: 10px;
-    transition: background 0.2s ease-in;
+    transition: background 0.1s ease-in;
     font-weight: bold;
     font-size: 18px;
 
@@ -25,6 +41,7 @@
       background: #000;
       border-bottom: 5px solid $marta-orange;
       position: relative;
+      padding: 30px 10px 25px;
 
 
 
@@ -49,6 +66,10 @@
         top: calc(100% - 5px);
         z-index: 3;
         background: $marta-yellow;
+      }
+
+      .activities__order {
+        display: flex;
       }
 
     }

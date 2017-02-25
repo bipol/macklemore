@@ -2,7 +2,6 @@ import $ from "jquery";
 import slick from "kenwheeler/slick";
 
 class Carousel {
-
     constructor() {
         Carousel.settings = {
             slidesToShow: 1,
@@ -13,44 +12,49 @@ class Carousel {
         };
 
         this.activitySelectedCount = 0;
-        this.el = $('.carousel');
-
 
         $(document).ready((e) => {
-            $('.carousel').slick(Carousel.settings);
+            this.el = $('.carousel');
+            this.nextBtn = this.el.find('.carousel__next-btn');
+            this.el.slick(Carousel.settings);
+            this.setupEvents();
         });
+
+
     }
 
     setupEvents() {
+        let self = this;
+        $('.activities__btn').on('click', function(e) {
+            let btn = $(this);
 
-        $('activity__btn').on('click', (e) => {
-            e.preventDefault();
-            let btn = $(e.target());
 
-            this.el.trigger('activity.select', btn.data('kw'));
+            self.el.trigger('activity.select', btn.data('kw'));
 
 
             if (btn.hasClass('selected')) {
                 btn.removeClass('selected');
-                this.activitySelectedCount--;
+                self.activitySelectedCount--;
 
             } else {
                 btn.addClass('selected');
-                this.activitySelectedCount++;
+                self.activitySelectedCount++;
             }
 
-            switch(this.activitySelectedCount) {
+            switch (self.activitySelectedCount) {
 
                 case 0:
-                    this.el.unslick();
+                    self.nextBtn.attr('disabled', 'disabled');
                     break;
                 case 1:
-                    this.el.slick(Carousel.settings);
-                    break;
-
+                    self.nextBtn.removeAttr('disabled');
             }
 
 
+        });
+
+        this.nextBtn.on('click', (e) => {
+            this.el.slick('slickNext');
         });
 
 

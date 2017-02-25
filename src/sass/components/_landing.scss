@@ -5,7 +5,7 @@
 
   &__title {
     font-size: 24px;
-    color: $brand-red;
+    color: #000;
     font-weight: bold;
     margin: 10px 0;
   }
@@ -36,23 +36,10 @@
     width: 77px;
     height: 70px;
     font-size: 16px;
-    color: $brand-red;
+    color: $marta-orange;
   }
 
-  &__btn {
-    margin: 20px 0;
-    padding: 25px 35px;
-    box-sizing: border-box;
-    background-color: $brand-red;
-    border: 1px solid $brand-gold;
-    color: #FFF;
-    width: 100%;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 0;
-    -webkit-appearance: none;
-  }
+
 
 
 }
