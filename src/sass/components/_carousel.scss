@@ -23,6 +23,32 @@
     margin: 0;
     padding: 15px 0;
     overflow-y: scroll;
+    position: relative;
+  }
+
+  &__spinner {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+    background: #FFF;
+
+    img {
+      width: 100px;
+      height: 100px;
+      margin-top: 20vh;
+    }
+
+
+    &.hide {
+      display: none;
+
+    }
+
   }
 
   &--second-slide {
