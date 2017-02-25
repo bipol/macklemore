@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (..)
 import Navigation
@@ -7,8 +7,10 @@ import Date exposing (..)
 import Task exposing (..)
 import Geolocation exposing (..)
 import List exposing (..)
+import Json.Encode
 import Json.Decode exposing (string, Decoder, bool, int, float)
 import Json.Decode.Pipeline exposing (..)
+import Time exposing (Time)
 import Http
 
 
@@ -23,6 +25,9 @@ main =
         , subscriptions = subscriptions
         , view = view
         }
+
+
+port createMap : ( Float, Float ) -> Cmd msg
 
 
 
@@ -67,6 +72,7 @@ type Msg
     | SetEndDate String
     | InputSearch String
     | UrlChange Navigation.Location
+    | CreateMap
     | NoOp
 
 
@@ -82,7 +88,11 @@ update msg model =
 
         -- there is an assumption here that we will have the date before the location
         GetInitialLocation (Ok location) ->
-            { model | location = Just location } ! [ getItinerary ]
+            let
+                newModel =
+                    { model | location = Just location }
+            in
+                newModel ! [ getItinerary newModel ]
 
         GetInitialLocation (Err error) ->
             { model | location = Nothing } ! []
@@ -91,7 +101,11 @@ update msg model =
             { model | itinerary = Just itinerary } ! []
 
         GetItinerary (Err error) ->
-            model ! []
+            let
+                stuff =
+                    Debug.log "STUFF" error
+            in
+                model ! []
 
         InputSearch string ->
             model ! []
@@ -101,6 +115,14 @@ update msg model =
 
         SetEndDate time ->
             model ! []
+
+        CreateMap ->
+            case model.location of
+                Just location ->
+                    model ! [ createMap ( location.latitude, location.longitude ) ]
+
+                Nothing ->
+                    model ! []
 
         NoOp ->
             model ! []
@@ -145,19 +167,9 @@ type alias Place =
 
 type alias PlaceLocation =
     { address : String
-    , lat : Int
-    , long : Int
+    , lat : Float
+    , long : Float
     }
-
-
-defaultDate : Date.Date
-defaultDate =
-    case Date.fromString "1970-01-01T00:00:00Z" of
-        Ok date ->
-            date
-
-        Err _ ->
-            Debug.crash "Invalid Date"
 
 
 encodeGoogleUrl : PlaceLocation -> String
@@ -228,18 +240,38 @@ urlBuilder parts =
     List.foldr (++) "" <| List.intersperse "/" parts
 
 
-getItinerary : Cmd Msg
-getItinerary =
-    Http.send GetItinerary <|
-        Http.get "http://localhost:3002/api/itinerary" (Json.Decode.list decodePlace)
+getItinerary : Model -> Cmd Msg
+getItinerary model =
+    let
+        currTime =
+            case model.startTime of
+                Just startTime ->
+                    Date.toTime startTime
+
+                Nothing ->
+                    Debug.crash "location isn't loaded"
+
+        currLocation =
+            case model.location of
+                Just location ->
+                    (toString location.longitude) ++ ", " ++ (toString location.latitude)
+
+                Nothing ->
+                    Debug.crash "location isn't loaded"
+
+        body =
+            Http.jsonBody (encodeItineraryRequest (ItineraryRequest currTime currTime currLocation))
+    in
+        Http.send GetItinerary <|
+            Http.post "https://malone-api.herokuapp.com/api/itinerary" body (Json.Decode.list decodePlace)
 
 
 decodePlaceLocation : Decoder PlaceLocation
 decodePlaceLocation =
     decode PlaceLocation
         |> required "address" string
-        |> required "lat" int
-        |> required "long" int
+        |> required "lat" float
+        |> required "long" float
 
 
 decodePlace : Decoder Place
@@ -248,5 +280,21 @@ decodePlace =
         |> required "title" string
         |> required "description" string
         |> required "distance" int
-        |> required "event_time" (Json.Decode.map Date.fromTime float)
+        |> required "event_time" (Json.Decode.map (Date.fromTime << (*) 1000) float)
         |> required "location" decodePlaceLocation
+
+
+type alias ItineraryRequest =
+    { start_time : Time
+    , end_time : Time
+    , start_point : String
+    }
+
+
+encodeItineraryRequest : ItineraryRequest -> Json.Encode.Value
+encodeItineraryRequest record =
+    Json.Encode.object
+        [ ( "start_time", Json.Encode.float <| record.start_time )
+        , ( "end_time", Json.Encode.float <| record.end_time )
+        , ( "start_point", Json.Encode.string <| record.start_point )
+        ]

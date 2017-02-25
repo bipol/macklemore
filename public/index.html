@@ -5,12 +5,22 @@
     <link rel="stylesheet" href="vendor/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway" />
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
   </head>
 
   <body>
     <div id="app"></div>
     <script>
-      Elm.Main.embed(document.getElementById("app"))
+      var app = Elm.Main.embed(document.getElementById("app"))
+      var map = null;
+      app.ports.createMap.subscribe(function(latLng) {
+        map = L.map('map', {
+            center: [latLng[0], latLng[1]],
+            zoom: 13
+        });
+        L.marker([latLng[0], latLng[1]]).addTo(map);
+      });
     </script>
   </body>
 </html>
