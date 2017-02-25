@@ -256,9 +256,6 @@ placeCard currOpen idx place =
                 [ div
                     [ class "event__duration-value" ]
                     [ text "2" ]
-                , div
-                    [ class "event__duration-unit" ]
-                    [ text "HR" ]
                 ]
             , div
                 [ class "event__meta" ]
@@ -268,6 +265,12 @@ placeCard currOpen idx place =
                 , div
                     [ class "event__location" ]
                     [ text place.location.address ]
+                , div
+                    [ class "event__time-location" ]
+                    [ div [ class "event__time-block" ] [ text "1:00pm-3:00pm" ]
+                    , div [ class "event__location-link" ]
+                        [ a [ href <| encodeGoogleUrl place.location ] [ text "show on map" ] ]
+                    ]
                 ]
             , div
                 [ class "event__distance" ]
@@ -276,7 +279,7 @@ placeCard currOpen idx place =
                     [ text <| toString place.distance ]
                 , div
                     [ class "event__distance-unit" ]
-                    [ text "Mi" ]
+                    [ text "mi" ]
                 ]
             , descBox
             ]
