@@ -10,7 +10,7 @@
   flex-flow: row nowrap;
   align-items: center;
   padding: 25px 0;
-  border-bottom: 1px solid $brand-gold;
+  border-bottom: 1px solid #000;
 
   &__duration {
     width: 12%;
@@ -18,10 +18,10 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    color: $brand-red;
+    color: $marta-blue;
     font-weight: bold;
     justify-content: center;
-    border-right: 1px solid $brand-gold;
+    border-right: 1px solid $marta-blue;
   }
 
   &__distance {
@@ -30,10 +30,10 @@
     height: 65px;
     flex-flow: column nowrap;
     align-items: center;
-    color: $brand-gold;
+    color: $marta-orange;
     font-weight: bold;
     justify-content: center;
-    border-left: 1px solid $brand-red;
+    border-left: 1px solid $marta-orange;
   }
 
   &__duration-value, &__distance-value {
@@ -60,6 +60,10 @@
 
   &__location {
     margin-bottom: 5px;
+
+    .fa {
+      margin-left: 15px;
+    }
   }
 
   &__time-location {
@@ -69,12 +73,37 @@
 
 
   &__time-block {
-    color: $brand-red;
+    color: $marta-orange;
     margin-bottom: 5px;
   }
 
   &__description {
 
+  }
+
+  &--gold-line {
+
+    .event__location {
+      color: rgba(247, 205, 48, 1);
+    }
+  }
+
+  &--blue-line {
+    .event__location {
+      color: rgba(62, 120, 218, 1);
+    }
+  }
+
+  &--red-line {
+    .event__location {
+      color: rgba(232, 25, 25, 1);
+    }
+  }
+
+  &--green-line {
+    .event__location {
+      color: rgba(39, 148, 156, 1);
+    }
   }
 
 
@@ -121,7 +150,7 @@
     }
 
     &__time-block {
-      color: $brand-red;
+      color: $marta-orange;
       margin-bottom: 0;
     }
 

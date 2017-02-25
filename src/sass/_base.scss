@@ -49,15 +49,15 @@ header {
 }
 
 a {
-  color: $brand-gold;
+  color: $marta-yellow;
   cursor: pointer;
 
   &:hover {
-    color: $brand-red;
+    color: $marta-orange;
   }
 
   &:active {
-    color: $brand-red;
+    color: $marta-orange;
   }
 }
 
