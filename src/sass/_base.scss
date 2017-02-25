@@ -27,13 +27,15 @@ header {
 }
 
 a {
-  color: #FFF;
-  text-decoration: none;
+  color: $brand-gold;
   cursor: pointer;
 
   &:hover {
-    color: #FFF;
-    text-decoration: underline;
+    color: $brand-red;
+  }
+
+  &:active {
+    color: $brand-red;
   }
 }
 

@@ -62,12 +62,19 @@
     margin-bottom: 5px;
   }
 
-  &__description {
-
+  &__time-location {
+    display: flex;
+    flex-flow: column nowrap;
   }
+
 
   &__time-block {
     color: $brand-red;
+    margin-bottom: 5px;
+  }
+
+  &__description {
+
   }
 
 
@@ -97,8 +104,27 @@
 
     &__location {
       font-size: 16px;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
+
+  }
+
+  @media #{$viewports-med-lg} {
+
+    &__time-location {
+      flex-flow: row nowrap;
+      align-items: center;
+    }
+
+    &__location-link {
+      margin-left: 15px;
+    }
+
+    &__time-block {
+      color: $brand-red;
+      margin-bottom: 0;
+    }
+
   }
 
   @media #{$viewport-lg} {
