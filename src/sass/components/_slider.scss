@@ -114,6 +114,11 @@
 
     }
 
+    &__key {
+      margin-left: 0;
+      width: 100%;
+    }
+
     &__key-label {
       justify-content: flex-start;
       span {
