@@ -1,31 +1,31 @@
 
 @font-face {
-    font-family: 'Houschka';
-    src: url('../fonts/HouschkaMedium.ttf');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Houschka';
+  src: url('../fonts/HouschkaMedium.ttf');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Houschka';
-    src: url('../fonts/HouschkaBold.ttf');
-    font-weight: bold;
-    font-style: normal;
+  font-family: 'Houschka';
+  src: url('../fonts/HouschkaBold.ttf');
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Houschka';
-    src: url('../fonts/HouschkaLight.ttf');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'Houschka';
+  src: url('../fonts/HouschkaLight.ttf');
+  font-weight: 300;
+  font-style: normal;
 }
 
 
 html
 {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -66,6 +66,13 @@ input {
   background: none;
 
   &:focus {
-      outline: none;
-    }
+    outline: none;
+  }
+}
+
+button {
+
+  &:focus {
+    outline: none;
+  }
 }

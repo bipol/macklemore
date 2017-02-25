@@ -1,0 +1,33 @@
+.activities {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+
+  &__btn {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    width: calc(50% - 5px);
+    padding: 30px 10px;
+    box-sizing: border-box;
+    background: rgba(59, 206, 177, 0.65);
+    border: 1px solid $brand-green;
+    color: #FFF;
+    margin-bottom: 10px;
+    transition: background 0.2s ease-in;
+    font-weight: bold;
+    font-size: 18px;
+
+    &.selected {
+      background: rgba(59, 206, 177, 1);
+    }
+
+    i {
+      margin-left: 15px;
+    }
+  }
+
+}
