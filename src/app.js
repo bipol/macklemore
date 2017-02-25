@@ -8273,8 +8273,6 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                         $('.activities__btn').on('click', function (e) {
                             var btn = $(this);
 
-                            console.log('click', btn);
-
                             self.el.trigger('activity.select', btn.data('kw'));
 
                             if (btn.hasClass('selected')) {
@@ -8307,7 +8305,7 @@ $__System.register("1", ["5", "6", "8", "a"], function (_export) {
                 return Carousel;
             })();
 
-            _export("default", new Carousel());
+            _export("default", Carousel);
         }
     };
 });

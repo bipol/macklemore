@@ -1,14 +1,36 @@
 .carousel {
+  width: 300%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: left 0.2s ease-in;
+  display: flex;
+  flex-flow: row nowrap;
+
+  &__container {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    height: 100%;
+  }
+
 
   &__slide {
-    width: 100%;
+    width: 33%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    flex-flow: column nowrap;
     margin: 0;
     padding: 15px 0;
     overflow-y: scroll;
+  }
 
+  &--second-slide {
+    left: -100%;
+  }
+
+  &--third-slide {
+    left: -200%;
   }
 
   &__slide-title {
