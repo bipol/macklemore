@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Navigation
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, href)
 import Date exposing (..)
 import Task exposing (..)
 import Geolocation exposing (..)
@@ -160,6 +160,14 @@ defaultDate =
             Debug.crash "Invalid Date"
 
 
+encodeGoogleUrl : PlaceLocation -> String
+encodeGoogleUrl placeLocation =
+    "https://maps.google.com/?q=@"
+        ++ toString placeLocation.lat
+        ++ ", "
+        ++ toString placeLocation.long
+
+
 placeCard : Place -> Html Msg
 placeCard place =
     div
@@ -182,8 +190,14 @@ placeCard place =
                 [ class "event__location" ]
                 [ text place.location.address ]
             , div
-                [ class "event__time-block" ]
-                [ text <| toString place.event_time ]
+                [ class "event__time-location" ]
+                [ div
+                    [ class "event__time-block" ]
+                    [ text <| toString place.event_time ]
+                , div
+                    [ class "event__location-link" ]
+                    [ a [ href <| encodeGoogleUrl place.location ] [ text "show on map" ] ]
+                ]
             ]
         , div
             [ class "event__distance" ]
